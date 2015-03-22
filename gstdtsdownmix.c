@@ -164,7 +164,7 @@ static gboolean gst_dtsdownmix_sink_event(GstPad * pad, GstObject *parent, GstEv
 			{
 				GstCaps *caps;
 				gst_event_parse_caps (event, &caps);
-				ret = gst_dtsdownmix_setcaps(dts->srcpad, caps);
+				ret = gst_pad_set_caps(dts->srcpad, caps);
 			}
 			break;
 		case GST_EVENT_SEGMENT:
@@ -195,7 +195,7 @@ static gboolean gst_dtsdownmix_sink_event(GstPad * pad, GstObject *parent, GstEv
 			}
 			break;
 		case GST_EVENT_FLUSH_STOP:
-      if (dts->cache) 
+			if (dts->cache)
 			{
 				gst_buffer_unref(dts->cache);
 				dts->cache = NULL;

@@ -160,12 +160,18 @@ static gboolean gst_dtsdownmix_sink_event(GstPad * pad, GstObject *parent, GstEv
 			gst_segment_set_newsegment(&dts->segment, update, rate, format, start, end, pos);
 #else
 		case GST_EVENT_CAPS:
-			if (dts->srcpad)
+			if (!get_downmix_setting())
+			{
+				ret = FALSE;
+			}
+			else if (dts->srcpad)
 			{
 				GstCaps *caps;
-				gst_event_parse_caps(event, &caps);
 				GstCaps *srccaps = gst_caps_from_string("audio/x-private1-lpcm, framed =(boolean) true");
+				
+				gst_event_parse_caps(event, &caps);
 				ret = gst_pad_set_caps(dts->srcpad, srccaps);
+
 				gst_caps_unref(srccaps);
 				gst_event_unref(event);
 			}

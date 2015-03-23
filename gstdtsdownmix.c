@@ -15,6 +15,8 @@
 
 #include "gstdtsdownmix.h"
 
+static gboolean get_downmix_setting();
+
 GST_DEBUG_CATEGORY_STATIC(dtsdownmix_debug);
 #define GST_CAT_DEFAULT (dtsdownmix_debug)
 

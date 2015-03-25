@@ -32,7 +32,7 @@ static GstStaticPadTemplate src_factory = GST_STATIC_PAD_TEMPLATE ("src",
 	GST_PAD_SRC,
 	GST_PAD_SOMETIMES,
 	GST_STATIC_CAPS(
-			"audio/x-private1-lpcm, framed =(boolean) true, rate = (int) [ 4000, 96000 ], " "channels = (int) [ 1, 6 ]; "
+			"audio/x-raw, framed =(boolean) true, rate = (int) [ 4000, 96000 ], " "channels = (int) [ 1, 2 ]; "
 			)
 	);
 
@@ -169,7 +169,7 @@ static gboolean gst_dtsdownmix_sink_event(GstPad * pad, GstObject *parent, GstEv
 			else if (dts->srcpad)
 			{
 				GstCaps *caps;
-				GstCaps *srccaps = gst_caps_from_string("audio/x-private1-lpcm, framed =(boolean) true");
+				GstCaps *srccaps = gst_caps_from_string("audio/x-raw");
 				
 				gst_event_parse_caps(event, &caps);
 				ret = gst_pad_set_caps(dts->srcpad, srccaps);
@@ -314,7 +314,8 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 				{
 					for (c = 0; c < dts->using_channels; c++)
 					{
-						*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[c * 256 + n] * 32767.5 + 0.5), -32767, 32767));
+						//*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[c * 256 + n] * 32767.5 + 0.5), -32767, 32767));
+						*dest = dts->samples[c * 256 + n];
 						dest++;
 					}
 				}
@@ -541,7 +542,7 @@ static GstStateChangeReturn gst_dtsdownmix_change_state(GstElement * element, Gs
 			}
 			else
 			{
-				GstCaps *srccaps = gst_caps_from_string("audio/x-private1-lpcm, framed =(boolean) true");
+				GstCaps *srccaps = gst_caps_from_string("audio/x-raw");
 				GstElementClass *klass = GST_ELEMENT_GET_CLASS(dts);
 				GstPadTemplate *templ = gst_element_class_get_pad_template(klass, "src");
 				if (dts->srcpad)

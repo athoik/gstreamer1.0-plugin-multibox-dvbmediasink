@@ -252,17 +252,12 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 	sample_t bias = 0;
 	gint flags = DCA_STEREO; /* force downmix to stereo */
 
-	//flags |= DCA_ADJUST_LEVEL;
-
 	/* process */
 	if (dca_frame(dts->state, data, &flags, &level, bias))
 	{
 		GST_WARNING_OBJECT(dts, "dts_frame error");
 		return GST_FLOW_ERROR;
 	}
-
-	/* disable dynamic range compression */
-	dca_dynrng (dts->state, NULL, NULL);
 
 	/* handle decoded data, one block is 256 samples */
 	num_blocks = dca_blocks_num(dts->state);

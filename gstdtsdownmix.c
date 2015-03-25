@@ -248,7 +248,7 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 {
 	gint num_blocks;
 	GstBuffer *buffer = NULL;
-	level_t level = 32767;
+	level_t level = 1;
 	sample_t bias = 0;
 	gint flags = DCA_STEREO; /* force downmix to stereo */
 
@@ -319,8 +319,8 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 				{
 					for (c = 0; c < dts->using_channels; c++)
 					{
-						//*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[c * 256 + n] * 32767.5 + 0.5), -32767, 32767));
-						*dest = GINT16_TO_BE(dts->samples[c * 256 + n]);
+						*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[c * 256 + n] * 32767.5 + 0.5), -32767, 32767));
+						//*dest = GINT16_TO_BE(dts->samples[c * 256 + n]);
 						dest++;
 					}
 				}

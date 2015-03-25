@@ -317,12 +317,10 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 				int n, c;
 				for (n = 0; n < 256; n++)
 				{
-					for (c = 0; c < dts->using_channels; c++)
-					{
-						*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[c * 256 + n] * 32767.5 + 0.5), -32767, 32767));
-						//*dest = GINT16_TO_BE(dts->samples[c * 256 + n]);
-						dest++;
-					}
+					*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[n] * 32767.5 + 0.5), -32767, 32767));
+					dest++;
+					*dest = GINT16_TO_BE(CLAMP((gint32)(dts->samples[256 + n] * 32767.5 + 0.5), -32767, 32767));
+					dest++;
 				}
 			}
 		}

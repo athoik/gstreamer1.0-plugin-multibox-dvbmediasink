@@ -318,9 +318,9 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 				int n;
 				for (n = 0; n < 256; n++)
 				{
-					*dest = convert(dts->samples[n]);
+					*dest = GINT16_TO_BE(convert(dts->samples[n]));
 					dest++;
-					*dest = convert(dts->samples[256 + n]);
+					*dest = GINT16_TO_BE(convert(dts->samples[256 + n]));
 					dest++;
 				}
 			}

@@ -17,6 +17,12 @@
 
 static gboolean get_downmix_setting();
 
+static inline gint16 convert(sample_t s)
+{
+	int i = s * 0x7fff;
+	return (i > 32767) ? 32767 : ((i < -32768) ? -32768 : i);
+}
+
 GST_DEBUG_CATEGORY_STATIC(dtsdownmix_debug);
 #define GST_CAT_DEFAULT (dtsdownmix_debug)
 
@@ -312,9 +318,9 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 				int n;
 				for (n = 0; n < 256; n++)
 				{
-					*dest = GINT16_TO_BE((gint16)(dts->samples[n] * 32767.0f));
+					*dest = convert(dts->samples[n]);
 					dest++;
-					*dest = GINT16_TO_BE((gint16)(dts->samples[256 + n] * 32767.0f));
+					*dest = convert(dts->samples[256 + n]);
 					dest++;
 				}
 			}

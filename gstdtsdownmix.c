@@ -19,7 +19,7 @@ static gboolean get_downmix_setting();
 
 static inline gint16 convert(sample_t s)
 {
-	int i = s * 0x7fff;
+	int i = (int)(s * 32767.0);
 	return (i > 32767) ? 32767 : ((i < -32768) ? -32768 : i);
 }
 

@@ -258,6 +258,8 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 	sample_t bias = 0;
 	gint flags = DCA_STEREO; /* force downmix to stereo */
 
+	flags |= DCA_ADJUST_LEVEL;
+
 	/* process */
 	if (dca_frame(dts->state, data, &flags, &level, bias))
 	{

@@ -19,8 +19,8 @@ static gboolean get_downmix_setting();
 
 static inline gint16 convert(sample_t s)
 {
-	int i = (int)(s * 1.0);
-	return CLAMP(i, -32768, 32767);
+	int i = (int)(s * 32767.0);
+	return (i > 32767) ? 32767 : ((i < -32768) ? -32768 : i);
 }
 
 GST_DEBUG_CATEGORY_STATIC(dtsdownmix_debug);
@@ -254,7 +254,7 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 {
 	gint num_blocks;
 	GstBuffer *buffer = NULL;
-	level_t level = 32767;
+	level_t level = 1;
 	sample_t bias = 0;
 	gint flags = DCA_STEREO; /* force downmix to stereo */
 

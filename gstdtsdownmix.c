@@ -19,8 +19,8 @@ static gboolean get_downmix_setting();
 
 static inline gint16 convert(sample_t s)
 {
-	int i = (int)(s * 32767.0);
-	return (i > 32767) ? 32767 : ((i < -32768) ? -32768 : i);
+	gint32 i = (gint32)(s * 32767.5 + 0.5);
+	return CLAMP(i, -32767, 32767);
 }
 
 GST_DEBUG_CATEGORY_STATIC(dtsdownmix_debug);
@@ -290,24 +290,36 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 		GST_BUFFER_TIMESTAMP(buffer) = dts->timestamp;
 		dts->timestamp += GST_BUFFER_DURATION(buffer);
 
+		gint8 freq_code = 0;
+
+		switch (dts->sample_rate)
+		{
+		default:
+		case 48000:
+			freq_code = 0;
+			break;
+		case 96000:
+			freq_code = 1;
+			break;
+		/* TODO Check if 44100 and 32000 frequency is supported
+		case 44100:
+			freq_code = 2;
+			break;
+		case 32000:
+			freq_code = 3;
+			break; */
+		}
+
 		*header++ = 0xa0;
 		*header++ = 0x01; /* frame count */
 		*header++ = 0x00; /* first access unit pointer msb */
 		*header++ = 0x04; /* first access unit pointer lsb: skip header */
 		*header++ = 0x00; /* frame number */
-		switch (dts->sample_rate)
-		{
-		default:
-		case 48000:
-			*header = 0x00;
-			break;
-		case 96000:
-			*header = 0x10;
-			break;
-		}
-		*header++ |= dts->using_channels - 1;
-		*header++ = 0x80;
+		*header++ = (freq_code << 4) | (dts->using_channels - 1);
+		*header++ = 0x80; /* neutral dynamic range */
+
 		dest = (gint16*)header;
+
 		for (i = 0; i < num_blocks; i++)
 		{
 			if (dca_block(dts->state))

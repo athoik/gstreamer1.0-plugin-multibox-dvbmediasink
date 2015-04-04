@@ -17,12 +17,6 @@
 
 static gboolean get_downmix_setting();
 
-static inline gint16 convert(sample_t s)
-{
-	gint32 i = (gint32)(rectangle_dither(s) * 32767.5 + 0.5);
-	return CLAMP(i, -32767, 32767);
-}
-
 // This is supposed to produce white noise and no dc
 #define DITHER_NOISE (rand() / (float)RAND_MAX - 0.5f)
 
@@ -40,6 +34,12 @@ static inline sample_t triangle_dither(sample_t sample)
     //mTriangleState = r;
 
     return result;
+}
+
+static inline gint16 convert(sample_t s)
+{
+	gint32 i = (gint32)(rectangle_dither(s) * 32767.5 + 0.5);
+	return CLAMP(i, -32767, 32767);
 }
 
 GST_DEBUG_CATEGORY_STATIC(dtsdownmix_debug);

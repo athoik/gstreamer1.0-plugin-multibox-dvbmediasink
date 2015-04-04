@@ -19,8 +19,8 @@ static gboolean get_downmix_setting();
 
 static inline gint16 convert(sample_t s)
 {
-	gint32 i = (gint32)(s * 32767.5 + 0.5);
-	return CLAMP(i, -32767, 32767);
+	gint32 i = (gint32)(s * 8388607.5 + 0.5);
+	return CLAMP(i, -8388607, 8388607);
 }
 
 GST_DEBUG_CATEGORY_STATIC(dtsdownmix_debug);
@@ -273,11 +273,11 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 #if GST_VERSION_MAJOR < 1
 	if (gst_pad_alloc_buffer_and_set_caps(dts->srcpad, 0, num_blocks * 256 * dts->using_channels * 2 + 7, GST_PAD_CAPS(dts->srcpad), &buffer) == GST_FLOW_OK)
 #else
-	if ((buffer = gst_buffer_new_allocate(NULL, num_blocks * 256 * dts->using_channels * 2 + 7, NULL)))
+	if ((buffer = gst_buffer_new_allocate(NULL, num_blocks * 256 * dts->using_channels * 3 + 7, NULL)))
 #endif
 	{
 		gint i;
-		gint16 *dest;
+		gint8 *dest;
 		gint8 *header;
 #if GST_VERSION_MAJOR < 1
 		header = GST_BUFFER_DATA(buffer);
@@ -310,32 +310,64 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 			break; */
 		}
 
+		/*
+		 * LPCM DVD header :
+		 * - number of frames in this packet (8 bits)
+		 * - first access unit (16 bits) == 0x0003 ?
+		 * - emphasis (1 bit)
+		 * - mute (1 bit)
+		 * - reserved (1 bit)
+		 * - current frame (5 bits)
+		 * - quantisation (2 bits) 0 == 16bps, 1 == 20bps, 2 == 24bps, 3 == illegal
+		 * - frequency (2 bits) 0 == 48 kHz, 1 == 96 kHz, 2 == 44.1 kHz, 3 == 32 kHz
+		 * - reserved (1 bit)
+		 * - number of channels - 1 (3 bits) 1 == 2 channels
+		 * - dynamic range (8 bits) 0x80 == neutral
+		 *
+		 */
+
 		*header++ = 0xa0;
 		*header++ = 0x01; /* frame count */
 		*header++ = 0x00; /* first access unit pointer msb */
 		*header++ = 0x04; /* first access unit pointer lsb: skip header */
 		*header++ = 0x00; /* frame number */
-		*header++ = (freq_code << 4) | (dts->using_channels - 1);
+		*header++ = (2 << 6) | (freq_code << 4) | (dts->using_channels - 1);
 		*header++ = 0x80; /* neutral dynamic range */
 
-		dest = (gint16*)header;
+		dest = (gint8*)header;
 
 		for (i = 0; i < num_blocks; i++)
 		{
 			if (dca_block(dts->state))
 			{
 				GST_WARNING_OBJECT(dts, "dts_block error %d", i);
-				dest += 256 * dts->using_channels;
+				dest += 256 * dts->using_channels * 3;
 			}
 			else
 			{
 				int n;
-				for (n = 0; n < 256; n++)
+				gint32 sample1, sample2, sample3, sample4;
+				for (n = 0; n < 256; n+=2)
 				{
-					*dest = GINT16_TO_BE(convert(dts->samples[n]));
-					dest++;
-					*dest = GINT16_TO_BE(convert(dts->samples[256 + n]));
-					dest++;
+					sample1 = convert(dts->samples[n]);
+					sample2 = convert(dts->samples[256 + n]);
+					sample3 = convert(dts->samples[1 + n]);
+					sample4 = convert(dts->samples[1 + 256 + n]);
+
+					dest[0] = sample1 >> 16;
+					dest[1] = (sample1 >> 8) & 0xff;
+					dest[2] = sample2 >> 16;
+					dest[3] = (sample2 >> 8) & 0xff;
+					dest[4] = sample3 >> 16;
+					dest[5] = (sample3 >> 8) & 0xff;
+					dest[6] = sample4 >> 16;
+					dest[7] = (sample4 >> 8) & 0xff;
+					dest[8] = sample1 & 0xff;
+					dest[9] = sample2 & 0xff;
+					dest[10] = sample3 & 0xff;
+					dest[11] = sample4 & 0xff;
+
+					dest += 12;
 				}
 			}
 		}

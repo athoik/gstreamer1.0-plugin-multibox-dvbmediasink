@@ -38,7 +38,7 @@ static inline sample_t triangle_dither(sample_t sample)
 
 static inline gint16 convert(sample_t s)
 {
-	gint32 i = (gint32)(rectangle_dither(s) * 32767.5 + 0.5);
+	gint32 i = (gint32)((s * 0.5) * 32767.5 + 0.5);
 	return CLAMP(i, -32767, 32767);
 }
 

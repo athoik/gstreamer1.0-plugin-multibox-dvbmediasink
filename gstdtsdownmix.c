@@ -108,6 +108,8 @@ static void gst_dtsdownmix_init(GstDtsDownmix *dts, GstDtsDownmixClass * g_class
 {
 	GstElement *element = GST_ELEMENT(dts);
 
+	srand(time(NULL));
+
 	/* create the sink pad */
 	dts->sinkpad = gst_pad_new_from_static_template (&sink_factory, "sink");
 	gst_pad_set_chain_function (dts->sinkpad,  GST_DEBUG_FUNCPTR (gst_dtsdownmix_chain));

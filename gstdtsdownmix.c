@@ -36,7 +36,7 @@ static inline sample_t rectangle_dither(sample_t sample)
 static inline sample_t triangle_dither(sample_t sample)
 {
     sample_t r = DITHER_NOISE;
-    //sample_t result = sample + r - mTriangleState;
+    sample_t result = sample + r; //- mTriangleState
     //mTriangleState = r;
 
     return result;

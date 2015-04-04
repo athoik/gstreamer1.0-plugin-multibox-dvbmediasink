@@ -310,6 +310,22 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 			break; */
 		}
 
+		/*
+		 * LPCM DVD header :
+		 * - number of frames in this packet (8 bits)
+		 * - first access unit (16 bits) == 0x0003 ?
+		 * - emphasis (1 bit)
+		 * - mute (1 bit)
+		 * - reserved (1 bit)
+		 * - current frame (5 bits)
+		 * - quantisation (2 bits) 0 == 16bps, 1 == 20bps, 2 == 24bps, 3 == illegal
+		 * - frequency (2 bits) 0 == 48 kHz, 1 == 96 kHz, 2 == 44.1 kHz, 3 == 32 kHz
+		 * - reserved (1 bit)
+		 * - number of channels - 1 (3 bits) 1 == 2 channels
+		 * - dynamic range (8 bits) 0x80 == neutral
+		 *
+		 */
+
 		*header++ = 0xa0;
 		*header++ = 0x01; /* frame count */
 		*header++ = 0x00; /* first access unit pointer msb */

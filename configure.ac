@@ -209,8 +209,8 @@ fi
 
 AC_ARG_WITH(maxpcmrate,
 	AS_HELP_STRING([--with-maxpcmrate],[Max PCM rate, default is 48000]),
-	[maxpcmrate=$withval],[maxpcmrate=48000])
-AC_DEFINE_UNQUOTED(MAX_PCM_RATE,"$maxpcmrate")
+	[MAX_PCM_RATE=$withval],[MAX_PCM_RATE=48000])
+AC_DEFINE_UNQUOTED(MAX_PCM_RATE,"$MAX_PCM_RATE")
 
 AC_ARG_WITH(eac3,
 	AS_HELP_STRING([--with-eac3],[support E-AC3 / AC3+ / DDP, yes or no]),

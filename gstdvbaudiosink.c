@@ -119,26 +119,19 @@ static guint gst_dvbaudiosink_signals[LAST_SIGNAL] = { 0 };
 #endif
 
 #define AC3CAPS \
-		"audio/x-ac3, " \
-		"framed =(boolean) true; " \
-		"audio/x-private1-ac3, " \
-		"framed =(boolean) true; "
+		"audio/x-ac3; " \
+		"audio/x-private1-ac3; " \
 
 #define EAC3CAPS \
-		"audio/x-eac3, " \
-		"framed =(boolean) true; " \
-		"audio/x-private1-eac3, " \
-		"framed =(boolean) true; "
+		"audio/x-eac3; " \
+		"audio/x-private1-eac3; "
 
 #define LPCMCAPS \
-		"audio/x-private1-lpcm, " \
-		"framed =(boolean) true; "
+		"audio/x-private1-lpcm; "
 
 #define DTSCAPS \
-		"audio/x-dts, " \
-		"framed =(boolean) true; " \
-		"audio/x-private1-dts, " \
-		"framed =(boolean) true; "
+		"audio/x-dts; " \
+		"audio/x-private1-dts; "
 
 #define WMACAPS \
 		"audio/x-wma; " \

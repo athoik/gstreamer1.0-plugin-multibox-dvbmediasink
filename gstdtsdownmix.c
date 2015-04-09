@@ -327,7 +327,7 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 		 */
 
 		*header++ = 0xa0;
-		*header++ = 0x01; /* frame count */
+		*header++ = 0x02; /* frame count */
 		*header++ = 0x00; /* first access unit pointer msb */
 		*header++ = 0x04; /* first access unit pointer lsb: skip header */
 		*header++ = 0x00; /* frame number */

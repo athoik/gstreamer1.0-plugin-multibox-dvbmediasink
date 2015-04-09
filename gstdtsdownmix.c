@@ -331,7 +331,9 @@ static GstFlowReturn gst_dtsdownmix_handle_frame(GstDtsDownmix *dts, guint8 *dat
 		*header++ = 0x00; /* first access unit pointer msb */
 		*header++ = 0x04; /* first access unit pointer lsb: skip header */
 		*header++ = 0x00; /* frame number */
-		*header++ = (2 << 6) | (freq_code << 4) | (dts->using_channels - 1);
+		//*header++ = (2 << 6) | (freq_code << 4) | (dts->using_channels - 1);
+		// 2<<6|0<<4|1 = 128|0|1 = 129 = 0x81
+		*header++ = 0x81;
 		*header++ = 0x80; /* neutral dynamic range */
 
 		dest = (gint8*)header;

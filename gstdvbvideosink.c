@@ -524,6 +524,7 @@ static gboolean gst_dvbvideosink_event(GstBaseSink *sink, GstEvent *event)
 		gst_event_parse_caps(event, &caps);
 		if (caps)
 		{
+			self->must_send_header = TRUE;
 			ret = gst_dvbvideosink_set_caps(sink, caps);
 			gst_caps_unref(caps);
 		}

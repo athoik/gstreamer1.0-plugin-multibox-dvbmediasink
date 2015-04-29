@@ -919,6 +919,11 @@ static gboolean gst_dvbaudiosink_event(GstBaseSink *sink, GstEvent *event)
 			}
 		}
 	}
+	case GST_EVENT_TAG:
+	{
+		gst_event_unref (event);
+		break;
+	}
 
 	default:
 		ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);

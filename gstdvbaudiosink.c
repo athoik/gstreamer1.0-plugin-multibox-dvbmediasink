@@ -902,6 +902,7 @@ static gboolean gst_dvbaudiosink_event(GstBaseSink *sink, GstEvent *event)
 				self->rate = rate;
 			}
 		}
+		ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
 		break;
 	}
 	case GST_EVENT_CAPS:

@@ -781,7 +781,6 @@ static gboolean gst_dvbaudiosink_event(GstBaseSink *sink, GstEvent *event)
 		self->flushing = TRUE;
 		/* wakeup the poll */
 		write(self->unlockfd[1], "\x01", 1);
-		if(self->paused) ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
 		break;
 	case GST_EVENT_FLUSH_STOP:
 		if (self->fd >= 0) ioctl(self->fd, AUDIO_CLEAR_BUFFER);
@@ -799,7 +798,6 @@ static gboolean gst_dvbaudiosink_event(GstBaseSink *sink, GstEvent *event)
 			self->cache = NULL;
 		}
 		GST_OBJECT_UNLOCK(self);
-		if(self->paused) ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
 		break;
 	case GST_EVENT_EOS:
 	{
@@ -849,7 +847,6 @@ static gboolean gst_dvbaudiosink_event(GstBaseSink *sink, GstEvent *event)
 #else
 		GST_BASE_SINK_PREROLL_LOCK(sink);
 #endif
-		if (ret) ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
 		break;
 	}
 #if GST_VERSION_MAJOR < 1
@@ -902,34 +899,11 @@ static gboolean gst_dvbaudiosink_event(GstBaseSink *sink, GstEvent *event)
 				self->rate = rate;
 			}
 		}
-		ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
 		break;
 	}
-	case GST_EVENT_CAPS:
-	{
-		GstCaps *caps;
-		gst_event_parse_caps(event, &caps);
-		if (caps)
-		{
-			ret = gst_dvbaudiosink_set_caps(sink, caps);
-			//gst_caps_unref(caps);
-			if (ret != TRUE)
-			{
-				//GST_ELEMENT_ERROR(self, STREAM, FORMAT,(NULL), ("Set caps failed. Stop render."));
-			}
-		}
-	}
-	case GST_EVENT_TAG:
-	{
-		gst_event_unref (event);
-		break;
 	}
 
-	default:
-		ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
-		break;
-	}
-
+	ret = GST_BASE_SINK_CLASS(parent_class)->event(sink, event);
 	return ret;
 }
 
